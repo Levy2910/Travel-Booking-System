@@ -1,0 +1,26 @@
+.containerLogin {
+    background-color: #F1F8E8;
+    border: 0.1em solid black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+}
+
+.formCss {
+    margin-top: 2em;
+    color: black;
+    padding: 1em;
+    width: 40%;
+}
+
+
+.buttonCss {
+    margin-top: 10px;
+    background-color: #55AD9B !important;
+}
+
+.title {
+    color: black;
+    text-align: center;
+}
