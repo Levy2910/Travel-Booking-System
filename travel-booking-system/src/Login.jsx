@@ -6,12 +6,14 @@ import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import axios from 'axios';
+import { Link, useNavigate } from 'react-router-dom'
 
 function Login() {
     return (
         <Container className="containerLogin text-white p-5 mt-5" >
             <div>
                 <h1 className='title '>Login</h1>
+
                 <Image src="./images/Plane.jpg" rounded />
             </div>
             {FormExample()}
@@ -20,12 +22,11 @@ function Login() {
 }
 
 function FormExample() {
-    const [validated, setValidated] = useState(false);
-
     const [formData, setFormData] = useState({
         email: '',
         password: ''
     });
+    const navigate = useNavigate();
 
     const handleChange = (event) => {
 
@@ -36,51 +37,36 @@ function FormExample() {
             [name]: value
         });
     };
-
+    const [error, setError] = useState(null);
 
     const handleSubmit = async (event) => {
-        console.log(formData)
         event.preventDefault();
         try {
             const response = await axios.post('http://localhost:3001/api/login', formData);
             console.log('Response:', response.data);
-            // Handle successful response
+            localStorage.setItem('userData', JSON.stringify(response.data.user));
+            navigate('/');
+
         } catch (error) {
             console.error('Error:', error);
-            // Handle error
+            setError('Failed to sign in. Please check your credentials and try again.')
         }
     };
 
     return (
-        <Form className="formCss" noValidate validated={validated} onSubmit={handleSubmit}  >
-            <Form.Group as={Col} controlId="validationCustom01">
-                <Form.Label >Email</Form.Label>
-                <Form.Control
-                    required
-                    type="text"
-                    placeholder="levycaoesc14@gmail.com"
-                    defaultValue="Vy"
-                    className="fieldCss"
-                    onChange={handleChange}
-                    name='email'
-                />
-                <Form.Control.Feedback>Looks good!</Form.Control.Feedback>
-            </Form.Group>
-            <Form.Group as={Col} controlId="validationCustom02">
-                <Form.Label>Password</Form.Label>
-                <Form.Control
-                    required
-                    type="text"
-                    placeholder="123!@#"
-                    defaultValue="123"
-                    className="fieldCss"
-                    onChange={handleChange}
-                    name='password'
-                />
-                <Form.Control.Feedback>Looks good!</Form.Control.Feedback>
-            </Form.Group>
-            <Button className="buttonCss" type="submit">Submit</Button>
-        </Form>
+        <form className="signupForm" onSubmit={handleSubmit}>
+            {error && <p className="error">{error}</p>}
+            <fieldset>
+                <label htmlFor="email">Email: </label>
+                <input type="text" name="email" id="email" onChange={handleChange} />
+            </fieldset>
+            <fieldset>
+                <label htmlFor="password">Password: </label>
+                <input type="text" name="password" id="password" onChange={handleChange} />
+            </fieldset>
+            <Button type='submit'> Sign In </Button>
+            <div>Don't have an account yet? <Link to={'/signup'}>Sign Up here</Link> </div>
+        </form>
     );
 }
 
