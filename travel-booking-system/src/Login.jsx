@@ -44,7 +44,9 @@ function FormExample() {
         try {
             const response = await axios.post('http://localhost:3001/api/login', formData);
             console.log('Response:', response.data);
-            localStorage.setItem('userData', JSON.stringify(response.data.user));
+            localStorage.setItem('email', JSON.stringify(response.data.user.email));
+            localStorage.setItem('userName', JSON.stringify(response.data.user.username));
+            localStorage.setItem('userID', JSON.stringify(response.data.user.id));
             navigate('/');
 
         } catch (error) {

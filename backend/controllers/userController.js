@@ -1,7 +1,7 @@
 const User = require('../models/userModel'); // Assuming you have a User model
 const bcrypt = require('bcrypt'); // For hashing passwords
 const jwt = require('jsonwebtoken'); // For creating JWT tokens
-
+const mongoose = require('mongoose');
 const signup = async (req, res) => {
     try {
         const { username, email, password } = req.body;
@@ -88,20 +88,26 @@ const forgetPassword = async (req, res) => {
 
 }
 
-const getUserProfile = async (req, res) => {
-    const userId = req.params.userId;
-    const user = await User.findById(userId);
-    res.status(200).json({
-        message: "user info: " + userId,
-        user: {
-            id: user._id,
-            username: user.username,
-            email: user.email
+const updateUserInfor = async (req, res) => {
+
+    const { username, email, userID } = req.body;
+    try {
+
+        // Find the user by ID and update
+        const user = await User.findByIdAndUpdate(userID, { username, email }, { new: true });
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
         }
-    })
 
-}
+        res.status(200).json({ message: 'User information updated successfully', user });
+    } catch (error) {
+        console.error('Error updating user information:', error);
+        res.status(500).json({ message: 'Internal Server Error', error: error.message });
+    }
+};
 
 
 
-module.exports = { signup, login, forgetPassword, getUserProfile };
+
+module.exports = { signup, login, forgetPassword, updateUserInfor };

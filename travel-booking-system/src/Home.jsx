@@ -4,7 +4,6 @@ import BookingCards from './BookingCards';
 function Home() {
     return (
         <div>
-            <BookingNav />
             <BookingCards />
         </div>
     );
