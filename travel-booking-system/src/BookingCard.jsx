@@ -1,9 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, Button } from 'react-bootstrap';
+import axios from 'axios';
 
-function BookingCard({ title, price, description, photos, comments, ratings }) {
+function BookingCard({ title, price, description, photos, comments, ratings, id }) {
     const [details, setDetails] = useState(false);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const [comment, setComment] = useState('');
+    const [cmts, setCmts] = useState(comments);
+    const [render, setRender] = useState(false);
+
+    useEffect(() => {
+        const fetchComments = async () => {
+            try {
+                const response = await axios.get(`http://localhost:3001/api/getComment/${id}`);
+                setCmts(response.data);
+                console.log(render);
+            } catch (e) {
+                console.error('Error fetching comments', e);
+            }
+        };
+        fetchComments();
+    }, [render]);
 
     const handleClick = () => {
         setDetails(true);
@@ -12,8 +29,29 @@ function BookingCard({ title, price, description, photos, comments, ratings }) {
     const handleClose = () => {
         setDetails(false);
     };
+
     const handleNextSlide = () => {
         setCurrentImageIndex((prevIndex) => (prevIndex + 1) % photos.length);
+    };
+
+    const handleComment = async () => {
+        try {
+            const storedUserName = JSON.parse(localStorage.getItem('userName'));
+            const formData = {
+                user: storedUserName,
+                text: comment,
+                date: new Date().toLocaleString()
+            };
+            const response = await axios.post(`http://localhost:3001/api/addComment/${id}`, formData);
+            setRender(prev => !prev);
+            setComment('');
+        } catch (error) {
+            console.error('Error adding comment:', error);
+        }
+    };
+
+    const handleChange = (e) => {
+        setComment(e.target.value);
     };
 
     const averageRating = ratings.length > 0 ? (ratings.reduce((a, b) => a + b, 0) / ratings.length).toFixed(1) : 'No ratings yet';
@@ -41,7 +79,7 @@ function BookingCard({ title, price, description, photos, comments, ratings }) {
                         <div className="slider">
                             <div className="slider-content">
                                 <Card.Img variant="top" src={photos[currentImageIndex]?.url || '/images/flinder.jpeg'} alt={photos[currentImageIndex]?.caption || 'Image'} />
-                                <Button onClick={handleNextSlide}>Next Slide</Button>
+                                <Button onClick={handleNextSlide} >Next Slide</Button>
                             </div>
                         </div>
                         <Card.Body>
@@ -55,13 +93,15 @@ function BookingCard({ title, price, description, photos, comments, ratings }) {
                             </Card.Text>
                             <div>Comments: </div>
                             <ul className="listComment">
-                                {comments.length > 0 ? comments.map((comment, index) => (
+                                {cmts.length > 0 ? cmts.map((comment, index) => (
                                     <li key={index}>
                                         <strong>{comment.username}:</strong> {comment.text}
                                         <br />
                                         <small>{new Date(comment.date).toLocaleDateString()}</small>
                                     </li>
                                 )) : <li>No comments yet</li>}
+                                <input type="text" placeholder='add your comment' value={comment} onChange={handleChange} />
+                                <Button onClick={handleComment}>Add comment</Button>
                             </ul>
                             <Button variant="primary" onClick={handleClose}>Close Details</Button>
                         </Card.Body>

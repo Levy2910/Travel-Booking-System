@@ -36,6 +36,7 @@ function BookingCards() {
                             photos={destination.photos}
                             comments={destination.comments}
                             ratings={destination.ratings}
+                            id={destination._id}
                         />
                     </Col>
                 ))}
