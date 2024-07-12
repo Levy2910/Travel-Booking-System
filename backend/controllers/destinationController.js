@@ -33,5 +33,40 @@ const getAllDestinations = async (req, res) => {
 const deleteDestination = () => {
     // request to delete destination, if it's valid, we delete. 
 }
+const addComment = async (req, res) => {
+    try {
+        const destinationID = req.params.destinationID;
+        const { user: username, text, date } = req.body;
 
-module.exports = { addDestination, getAllDestinations, deleteDestination };
+        const destination = await Destination.findByIdAndUpdate(destinationID, {
+            $push: { comments: { username, text, date } }
+        }, { new: true });
+
+        if (!destination) {
+            return res.status(404).send('Destination not found');
+        }
+
+        res.status(200).json(destination);
+    } catch (error) {
+        console.error('Error adding comment:', error);
+        res.status(500).send('Internal Server Error');
+    }
+};
+const getComments = async (req, res) => {
+    const destinationID = req.params.destinationID;
+    try {
+        const destination = await Destination.findById(destinationID);
+        if (!destination) {
+            return res.status(404).json({ message: 'Destination not found' });
+        }
+        // Assuming comments are stored within the destination document
+        const comments = destination.comments;
+        res.status(200).json(comments);
+    } catch (error) {
+        console.error('Error fetching comments:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
+
+module.exports = { addDestination, getAllDestinations, deleteDestination, addComment, getComments };
