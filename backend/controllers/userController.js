@@ -106,8 +106,36 @@ const updateUserInfor = async (req, res) => {
         res.status(500).json({ message: 'Internal Server Error', error: error.message });
     }
 };
+const addToCart = async (req, res) => {
+    const { userID, destinationID, destinationPrice } = req.body;
+
+    try {
+        // Find the user by ID
+        const user = await User.findOne({ _id: userID });
+
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        // Add destinationID to cart.items
+        if (!user.cart.items.some(item => item.destinationID === destinationID)) {
+            user.cart.items.push({ destinationID });
+            user.cart.totalMoney += destinationPrice;
+        }
+
+        // Save the updated user document
+        await user.save();
+
+        // Respond with success message or updated user object
+        res.status(200).json({ message: 'Item added to cart successfully', user });
+    } catch (error) {
+        console.error('Error adding item to cart:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
 
 
 
 
-module.exports = { signup, login, forgetPassword, updateUserInfor };
+
+module.exports = { signup, login, forgetPassword, updateUserInfor, addToCart };
