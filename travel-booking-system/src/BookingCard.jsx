@@ -9,6 +9,10 @@ function BookingCard({ title, price, description, photos, comments, ratings, id 
     const [cmts, setCmts] = useState(comments);
     const [render, setRender] = useState(false);
 
+
+    // global variable
+    var userID = JSON.parse(localStorage.getItem('userID'));
+
     useEffect(() => {
         const fetchComments = async () => {
             try {
@@ -33,14 +37,48 @@ function BookingCard({ title, price, description, photos, comments, ratings, id 
     const handleNextSlide = () => {
         setCurrentImageIndex((prevIndex) => (prevIndex + 1) % photos.length);
     };
+    const handleCart = async () => {
+        const cartItems = {
+            userID: userID,
+            destinationID: id,
+            destinationPrice: price
+        };
+
+        try {
+            const response = await axios.post("http://localhost:3001/api/addToCart", cartItems);
+
+            // Assuming your server responds with a message key for success
+            if (response.data.message) {
+                console.log("Success:", response.data.message);
+
+                // Display success message on the screen
+                const successMessage = document.createElement('p');
+                successMessage.textContent = response.data.message;
+                document.body.appendChild(successMessage);
+
+                // Optionally, you can clear the message after a few seconds
+                setTimeout(() => {
+                    successMessage.remove();
+                }, 3000); // Remove after 3 seconds (3000 milliseconds)
+
+            } else {
+                console.log("Unknown response format:", response.data);
+                // Handle unexpected server response
+            }
+
+        } catch (error) {
+            console.error("Error adding to cart:", error.message);
+            // Handle specific error cases or show a user-friendly message
+        }
+    };
+
 
     const handleComment = async () => {
         try {
             const storedUserName = JSON.parse(localStorage.getItem('userName'));
             const formData = {
                 user: storedUserName,
-                text: comment,
-                date: new Date().toLocaleString()
+                text: comment
             };
             const response = await axios.post(`http://localhost:3001/api/addComment/${id}`, formData);
             setRender(prev => !prev);
@@ -78,6 +116,7 @@ function BookingCard({ title, price, description, photos, comments, ratings, id 
                     <div className="detailCard">
                         <div className="slider">
                             <div className="slider-content">
+                                <Button onClick={handleCart}>Add to Cart</Button>
                                 <Card.Img variant="top" src={photos[currentImageIndex]?.url || '/images/flinder.jpeg'} alt={photos[currentImageIndex]?.caption || 'Image'} />
                                 <Button onClick={handleNextSlide} >Next Slide</Button>
                             </div>
