@@ -67,6 +67,23 @@ const getComments = async (req, res) => {
         res.status(500).json({ message: 'Server error' });
     }
 };
+const findAllDestinationByIDs = async (req, res) => {
+    const destinations = req.body.destinations;
+    try {
+        const data = [];
+        for (const destination of destinations) {
+            const des = await Destination.findById(destination);
+            if (des) {
+                data.push(des);
+            }
+        }
+        res.status(200).json({ message: 'Destinations fetched successfully', data });
+    } catch (e) {
+        console.error('Error fetching destinations:', e);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
 
 
-module.exports = { addDestination, getAllDestinations, deleteDestination, addComment, getComments };
+
+module.exports = { addDestination, getAllDestinations, deleteDestination, addComment, getComments, findAllDestinationByIDs };

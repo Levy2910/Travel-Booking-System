@@ -110,43 +110,58 @@ function BookingCard({ title, price, description, photos, comments, ratings, id 
                 </Card.Text>
                 <Button className="card-button" variant="primary" onClick={handleClick}>View Details</Button>
             </Card.Body>
-            {details &&
-                <div>
+            {details && (
+                <div className="detailCard-wrapper">
                     <div className="detailCard-overlay" onClick={handleClose}></div>
                     <div className="detailCard">
                         <div className="slider">
                             <div className="slider-content">
-                                <Button onClick={handleCart}>Add to Cart</Button>
-                                <Card.Img variant="top" src={photos[currentImageIndex]?.url || '/images/flinder.jpeg'} alt={photos[currentImageIndex]?.caption || 'Image'} />
-                                <Button onClick={handleNextSlide} >Next Slide</Button>
+                                <Card.Img
+                                    variant="top"
+                                    src={photos[currentImageIndex]?.url || '/images/flinder.jpeg'}
+                                    alt={photos[currentImageIndex]?.caption || 'Image'}
+                                    className="slider-image"
+                                />
+                                <Button className="next-slide-button" onClick={handleNextSlide}>Next Slide</Button>
                             </div>
                         </div>
                         <Card.Body>
-                            <Card.Title>{title}</Card.Title>
-                            <Card.Text>
+                            <Card.Title className="card-title">{title}</Card.Title>
+                            <Card.Text className="card-text">
                                 {description}
                                 <br />
                                 <strong>Price: </strong>${price}
                                 <br />
                                 <strong>Rating: </strong>{averageRating}
                             </Card.Text>
-                            <div>Comments: </div>
+                            <Button className="cart-button" onClick={handleCart}>Add to Cart</Button>
+                            <div className="comments-title">Comments:</div>
                             <ul className="listComment">
-                                {cmts.length > 0 ? cmts.map((comment, index) => (
-                                    <li key={index}>
-                                        <strong>{comment.username}:</strong> {comment.text}
-                                        <br />
-                                        <small>{new Date(comment.date).toLocaleDateString()}</small>
-                                    </li>
-                                )) : <li>No comments yet</li>}
-                                <input type="text" placeholder='add your comment' value={comment} onChange={handleChange} />
-                                <Button onClick={handleComment}>Add comment</Button>
+                                {cmts.length > 0 ? (
+                                    cmts.map((comment, index) => (
+                                        <li key={index} className="comment-item">
+                                            <strong>{comment.username}:</strong> {comment.text}
+                                            <br />
+                                            <small>{new Date(comment.date).toLocaleDateString()}</small>
+                                        </li>
+                                    ))
+                                ) : (
+                                    <li>No comments yet</li>
+                                )}
                             </ul>
-                            <Button variant="primary" onClick={handleClose}>Close Details</Button>
+                            <input
+                                type="text"
+                                placeholder="Add your comment"
+                                value={comment}
+                                onChange={handleChange}
+                                className="comment-input"
+                            />
+                            <Button className="comment-button" onClick={handleComment}>Add Comment</Button>
+                            <Button variant="primary" className="close-button" onClick={handleClose}>Close Details</Button>
                         </Card.Body>
                     </div>
                 </div>
-            }
+            )}
         </Card>
     );
 }

@@ -133,9 +133,26 @@ const addToCart = async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 };
+const getCart = async (req, res) => {
+    const userID = req.params.userID;
+
+    try {
+        const user = await User.findById(userID);
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        const cart = user.cart;
+
+        res.status(200).json({ message: 'Get items successfully', cart });
+    } catch (e) {
+        console.error('Error getting cart:', e);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
 
 
 
 
 
-module.exports = { signup, login, forgetPassword, updateUserInfor, addToCart };
+module.exports = { signup, login, forgetPassword, updateUserInfor, addToCart, getCart };
